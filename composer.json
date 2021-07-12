@@ -1,14 +1,14 @@
 {
     "name": "fengwuyan/article-manager",
-    "description": "description...",
+    "description": "文章管理系统",
     "type": "library",
     "keywords": ["laravel-admin", "extension"],
     "homepage": "https://github.com/fengwuyan/article-manager",
     "license": "MIT",
     "authors": [
         {
-            "name": "your name",
-            "email": "your email"
+            "name": "fengwuyan",
+            "email": "wxteamvc@163.com"
         }
     ],
     "require": {
