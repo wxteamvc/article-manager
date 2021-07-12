@@ -20,13 +20,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Encore\\\\ArticleManager\\": "src/"
+            "Encore\\ArticleManager\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Encore\\\\ArticleManager\\ArticleManagerServiceProvider"
+                "Encore\\ArticleManager\\ArticleManagerServiceProvider"
             ]
 
         }

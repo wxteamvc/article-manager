@@ -1,6 +1,6 @@
 <?php
 
-namespace Encore\\ArticleManager;
+namespace Encore\ArticleManager;
 
 use Illuminate\Support\ServiceProvider;
 

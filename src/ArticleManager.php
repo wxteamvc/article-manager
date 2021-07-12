@@ -1,6 +1,6 @@
 <?php
 
-namespace Encore\\ArticleManager;
+namespace Encore\ArticleManager;
 
 use Encore\Admin\Extension;
 
