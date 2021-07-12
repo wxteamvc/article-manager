@@ -2,4 +2,6 @@
 
 use Encore\ArticleManager\Http\Controllers\ArticleManagerController;
 
-Route::get('article-manager', ArticleManagerController::class.'@index');
+
+Route::resource('wx_articles', ArticleManagerController::class);
+Route::get('wx_articles', ArticleManagerController::class . "@index")->name('articlemanager.index');
