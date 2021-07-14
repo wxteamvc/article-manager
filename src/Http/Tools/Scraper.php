@@ -11,6 +11,32 @@ final class Scraper
 
     protected $client;
 
+    protected $use_imagecache;
+
+    /**
+     * 是否开启图片压缩
+     * @var bool
+     */
+    protected $is_resize;
+
+    /**
+     * 图片压缩宽和高
+     * @var
+     */
+    protected $resize_w_h;
+
+    /**
+     * 图片小于指定宽度不进行压缩
+     * @var
+     */
+    protected $not_resize_width;
+
+    /**
+     * 文件存储驱动
+     * @var \Illuminate\Config\Repository|\Illuminate\Foundation\Application|mixed
+     */
+    protected $disk;
+
     /**
      * 公众号文章图片可能的后缀
      * @var string[]
@@ -32,7 +58,7 @@ final class Scraper
      * 下载的图片保存的目录
      * @var string
      */
-    protected $save_path = '/wx_article_images';
+    protected $save_path = 'wx_article_images';
 
     /**
      * 采集规则
@@ -45,10 +71,28 @@ final class Scraper
         ],
     ];
 
-    public function __construct(array $rules = [])
+    public function __construct()
+    {
+        // 参数初始化
+        $this->init();
+
+//        $rules && $this->rules = array_merge($this->rules, $rules);
+    }
+
+
+    public function init()
     {
         $this->client = new Client();
-        $rules && $this->rules = array_merge($this->rules, $rules);
+        $this->disk = config('admin.upload.disk', 'admin');
+        $this->not_resize_width = (int)config('article_manager.not_resize_width', 100);
+        $this->is_resize = config('article_manager.is_resize', false);
+        if ($this->is_resize){
+            // 默认压缩图片宽度到480
+            $this->resize_w_h = config('article_manager.resize_w_h', [
+                'width' => 480,
+                'height' => 0
+            ]);
+        }
     }
 
     public function scrape($urls)
@@ -78,7 +122,7 @@ final class Scraper
         $crawler = new Crawler($html);
         // ====================采集文章标题=================================
         $article_title = $crawler->filter('#activity-name')->text();
-        $data['title'] = $article_title;
+        $data['title'] = trim($article_title);
         // ===============================================================
         $content = $crawler->filter('#img-content')->html();
         $crawler2 = new Crawler();
@@ -120,7 +164,7 @@ final class Scraper
             $src = $image_attr[0][0];
             $ext = $image_attr[0][1];
             if ($src){
-                $download = $this->downloadImages($src,true, $ext);
+                $download = $this->downloadImages($src, $ext);
                 $download && $images[] = $download;
             }
         });
@@ -137,6 +181,14 @@ final class Scraper
         $content = preg_replace($regex, "", $content);
         $regex = "%style='[^']+'%i";
         $content = preg_replace($regex, "", $content);
+        $regex = '%width="[^"]+"%i';
+        $content = preg_replace($regex, "", $content);
+        $regex = '%height="[^"]+"%i';
+        $content = preg_replace($regex, "", $content);
+        $regex = "%width='[^']+'%i";
+        $content = preg_replace($regex, "", $content);
+        $regex = "%height='[^']+'%i";
+        $content = preg_replace($regex, "", $content);
         // ==================过滤style结束===============================
         $data['content'] = $content;
 
@@ -151,21 +203,33 @@ final class Scraper
      * @return array|false
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function downloadImages(string $src,bool $is_resize, $ext = false)
+    protected function downloadImages(string $src, $ext = false)
     {
+        $image_size = getimagesize($src);
         $response = $this->client->request('get',$src);
         if ($response->getStatusCode() == 200){
             // 有后缀就直接取img标签里的后缀
             $ext ?: $ext = $this->getFileExt($src);
             $file_name = md5(time() . rand(100000, 999999)) . '.' . $ext;
             $filepath = $this->save_path . '/' . $file_name;
-            $saved = Storage::disk('admin')->put($filepath, $response->getBody());
+            $saved = Storage::disk($this->disk)->put($filepath, $response->getBody());
             if ($saved){
                 // 替代路径的时候判断要不要压缩,默认压缩返回的是imagecache组件处理过的图片.
                 // 后期考虑重写imagecache扩展的路由.使文件路径和fastdfs的风格保持一致
-                $replace_src = $is_resize ?
-                    route('imagecache', ['template' => 'w480', 'filename' => $file_name])
-                    : Storage::disk('admin')->url($filepath);
+                if ($this->disk == 'dropbox'){
+                    // gif 文件无法压缩
+
+                    if ($image_size && $this->is_resize && !in_array($ext, ['gif']) && $image_size[0] >= $this->not_resize_width){
+                        // 如果图片宽度大于不进行压缩的宽度,则添加宽度后缀
+                        $replace_src = Storage::disk($this->disk)->url($filepath) . $this->getResizeStr();
+                    }else{
+                        $replace_src = Storage::disk($this->disk)->url($filepath);
+                    }
+
+                }else{
+                    // 其他驱动暂时不开启图片压缩
+                    $replace_src = Storage::disk($this->disk)->url($filepath);
+                }
                 return [
                     'old_src' => $src,
                     'replace_src' => $replace_src
@@ -189,6 +253,18 @@ final class Scraper
             return 'tmp';
         }
         return $ext;
+    }
+
+    /**
+     * 获取图片压缩参数
+     * @return string
+     */
+    protected function getResizeStr()
+    {
+        if ($this->is_resize == false) return "";
+        // 去除控制
+        $resize_w_h = array_filter($this->resize_w_h);
+        return "?" . http_build_query($resize_w_h);
     }
 
 }
