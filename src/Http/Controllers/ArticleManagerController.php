@@ -9,6 +9,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Encore\ArticleManager\Http\Tools\Scraper;
+use Illuminate\Http\Request;
 use Illuminate\Support\MessageBag;
 
 class ArticleManagerController extends Controller
@@ -175,4 +176,34 @@ class ArticleManagerController extends Controller
 //
 //    }
 
+    /**
+     * 获取文章库列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getList(Request $request)
+    {
+        $search_name = $request->input('search_name', false);
+        $article_media = ArticleMedia::query()->select('id', 'title', 'url');
+        if ($search_name){
+            $article_media->where('title', 'like', "%{$search_name}%");
+        }
+        $list = $article_media->simplePaginate(5);
+        return response()->json($list);
+    }
+
+    /**
+     * 获取文章内容
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getContent(Request $request)
+    {
+        $id = $request->input('id', 0);
+        $article = ArticleMedia::find($id);
+        if (!$article){
+            return response()->json(['code' => 0, 'data' => [], 'message' => '文章没有找到']);
+        }
+        return response()->json(['code' => 1, 'data' => $article]);
+    }
 }

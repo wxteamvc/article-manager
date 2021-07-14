@@ -31,6 +31,8 @@ class ArticleManagerServiceProvider extends ServiceProvider
         });
         // ==================================================
 
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
         if ($views = $extension->views()) {
             $this->loadViewsFrom($views, 'article-manager');
         }
