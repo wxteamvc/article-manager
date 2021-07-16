@@ -88,10 +88,10 @@ final class Scraper
         $this->is_resize = config('article_manager.is_resize', false);
         if ($this->is_resize){
             // 默认压缩图片宽度到480
-            $this->resize_w_h = config('article_manager.resize_w_h', [
-                'width' => 480,
-                'height' => 0
-            ]);
+            $this->resize_w_h = [
+                'width' =>  config('article_manager.resize_w', 480),
+                'height' => config('article_manager.resize_h', 0)
+            ];
         }
     }
 

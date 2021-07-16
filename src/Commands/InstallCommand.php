@@ -3,6 +3,7 @@ namespace Encore\ArticleManager\Commands;
 
 
 use Encore\ArticleManager\ArticleManagerServiceProvider;
+use Encore\ArticleManager\ArticleMangerSeeder;
 use Illuminate\Console\Command;
 
 
@@ -39,19 +40,20 @@ class InstallCommand extends Command
      */
     public function handle()
     {
-        $this->info('正在发布资源文件......');
+//        $this->info('正在发布资源文件......');
+//
+//        $this->call('vendor:publish', [
+//            '--provider' => ArticleManagerServiceProvider::class,
+//            '--force' => true
+//        ]);
 
-        $this->call('vendor:publish', [
-            '--provider' => ArticleManagerServiceProvider::class,
-            '--force' => true
-        ]);
-
-        $this->info('正在执行迁移文件......');
+//        $this->info('正在执行迁移文件......');
 
         $this->call('migrate', ['--path' => './vendor/fengwuyan/article-manager/database/migrations']);
 
+        $this->call('db:seed', ['--class' => ArticleMangerSeeder::class]);
 
-        $this->info('安装完成');
+//        $this->info('安装完成');
     }
 
 }

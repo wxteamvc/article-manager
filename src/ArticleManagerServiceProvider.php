@@ -3,6 +3,7 @@
 namespace Encore\ArticleManager;
 
 use Encore\ArticleManager\Commands\InstallCommand;
+use Encore\ArticleManager\Http\Models\ExtendConfig;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,8 +32,6 @@ class ArticleManagerServiceProvider extends ServiceProvider
         });
         // ==================================================
 
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-
         if ($views = $extension->views()) {
             $this->loadViewsFrom($views, 'article-manager');
         }
@@ -51,6 +50,9 @@ class ArticleManagerServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             ArticleManager::routes(__DIR__.'/../routes/web.php');
         });
+
+        // 初始化时加载数据库的配置
+        ExtendConfig::loadConfigByGroup('article_manager');
     }
 
     public function register()
