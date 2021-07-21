@@ -45,6 +45,19 @@ class ArticleMangerSeeder extends Seeder
                 'module_name' => 'admin',
                 'parent_id' => 50,
                 'order' => 1,
+                'title' => '文章分类管理',
+                'icon' => 'fa-file',
+                'uri' => 'article_category',
+                'status' => 2,
+                'is_blank' => 1,
+                'created_at' => $datetime,
+                'updated_at' => $datetime
+            ]);
+            DB::table('admin_menu')->insert([
+                'id' => 53,
+                'module_name' => 'admin',
+                'parent_id' => 50,
+                'order' => 1,
                 'title' => '文章库配置',
                 'icon' => 'fa-file',
                 'uri' => 'extend_config/setting/article_manager',
@@ -53,8 +66,9 @@ class ArticleMangerSeeder extends Seeder
                 'created_at' => $datetime,
                 'updated_at' => $datetime
             ]);
+
         }catch (\Exception $e){
-            dump('菜单表添加记录失败,可能记录已经存在');
+//            dump('菜单表添加记录失败,可能记录已经存在');
         }
 
         try{
@@ -99,9 +113,10 @@ class ArticleMangerSeeder extends Seeder
                     'created_at' => $datetime,
                     'updated_at' => $datetime
                 ]
+
             ]);
         }catch(\Exception $exception){
-            dump('权限表添加记录失败,可能记录已经存在');
+//            dump('权限表添加记录失败,可能记录已经存在');
         }
 
         try {
@@ -123,7 +138,7 @@ class ArticleMangerSeeder extends Seeder
                 [
                     'id' => 54,
                     'module_name' => 'admin',
-                    'name' => '资源组件上传',
+                    'name' => '文章详情',
                     'slug' => 'article_manager.info',
                     'http_method' => 'GET',
                     'http_path' => '/article_manager_info',
@@ -132,10 +147,80 @@ class ArticleMangerSeeder extends Seeder
                     'is_default' => 2,
                     'created_at' => $datetime,
                     'updated_at' => $datetime
+                ],
+                [
+                    'id' => 55,
+                    'module_name' => 'admin',
+                    'name' => '文章分类列表',
+                    'slug' => 'article_manager.category',
+                    'http_method' => 'GET',
+                    'http_path' => '/article_manager_category_list',
+                    'parent_id' => 50,
+                    'order' => 0,
+                    'is_default' => 2,
+                    'created_at' => $datetime,
+                    'updated_at' => $datetime
+                ],
+            ]);
+        }catch(\Exception $exception){
+//            dump('资源组件权限添加失败,可能记录已经存在');
+        }
+
+        // 添加配置
+        $group = 'article_manager';
+        try {
+            DB::table('admin_extend_config')->insert([
+                [
+                    'id' => 1,
+                    'group' => 'article_manager',
+                    'title' => '是否开启图片压缩',
+                    'key' => 'is_resize',
+                    'value' => '1',
+                    'field_type' => 'switch',
+                    'help' => '开启后文章图片会进行压缩',
+                    'admin_id' => 1,
+                    'created_at' => $datetime,
+                    'updated_at' => $datetime
+                ],
+                [
+                    'id' => 2,
+                    'group' => 'article_manager',
+                    'title' => '图片压缩最小宽度',
+                    'key' => 'not_resize_width',
+                    'value' => '"200"',
+                    'field_type' => 'text',
+                    'help' => '在图片压缩开启的情况下,小于该宽度的图片不压缩',
+                    'admin_id' => 1,
+                    'created_at' => $datetime,
+                    'updated_at' => $datetime
+                ],
+                [
+                    'id' => 3,
+                    'group' => 'article_manager',
+                    'title' => '图片压缩宽度',
+                    'key' => 'resize_w',
+                    'value' => '"480"',
+                    'field_type' => 'text',
+                    'help' => '图片压缩的宽度,建议只填写宽度或者高度,图片等比例压缩',
+                    'admin_id' => 1,
+                    'created_at' => $datetime,
+                    'updated_at' => $datetime
+                ],
+                [
+                    'id' => 4,
+                    'group' => 'article_manager',
+                    'title' => '图片压缩高度',
+                    'key' => 'resize_h',
+                    'value' => '"0"',
+                    'field_type' => 'text',
+                    'help' => '',
+                    'admin_id' => 1,
+                    'created_at' => $datetime,
+                    'updated_at' => $datetime
                 ]
             ]);
         }catch(\Exception $exception){
-            dump('资源组件权限添加失败,可能记录已经存在');
+
         }
 
     }

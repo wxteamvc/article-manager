@@ -19,18 +19,7 @@ class ArticleManagerServiceProvider extends ServiceProvider
             return ;
         }
 
-        // =============增加一个微信文章验证规则=================
-        Validator::extend('wx_article', function($attribute, $value, $parameters, $validator){
-            $parse = parse_url($value);
-            if (!isset($parse['scheme']) || !in_array($parse['scheme'], ['http', 'https'])){
-                return false;
-            }
-            if (!isset($parse['host']) || $parse['host'] != "mp.weixin.qq.com"){
-                return false;
-            }
-            return true;
-        });
-        // ==================================================
+        $this->loadMigrationsFrom(__DIR__. '/../database/migrations');
 
         if ($views = $extension->views()) {
             $this->loadViewsFrom($views, 'article-manager');
@@ -53,6 +42,19 @@ class ArticleManagerServiceProvider extends ServiceProvider
 
         // 初始化时加载数据库的配置
         ExtendConfig::loadConfigByGroup('article_manager');
+
+        // =============增加一个微信文章验证规则=================
+        Validator::extend('wx_article', function($attribute, $value, $parameters, $validator){
+            $parse = parse_url($value);
+            if (!isset($parse['scheme']) || !in_array($parse['scheme'], ['http', 'https'])){
+                return false;
+            }
+            if (!isset($parse['host']) || $parse['host'] != "mp.weixin.qq.com"){
+                return false;
+            }
+            return true;
+        });
+        // ==================================================
     }
 
     public function register()

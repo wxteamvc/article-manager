@@ -152,9 +152,9 @@ class ExtendConfigController extends Controller
             $success = new MessageBag([
                 'title' => '创建配置成功'
             ]);
-            return redirect(route('extendConfig.index'));
+            return redirect(route('extend_config.index'));
         }catch(\Exception $exception){
-            dd($exception->getMessage());
+            return redirect(route('extend_config.index'))->withErrors($exception->getMessage());
         }
 
     }

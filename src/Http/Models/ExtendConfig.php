@@ -10,7 +10,7 @@ class ExtendConfig extends Model
     protected $table = 'admin_extend_config';
 
     // 缓存前缀
-    const cache_prefix = 'c_config_';
+    const cache_prefix = 'extend_config_';
 
     public static $field_options = [
         'text' => 'Text文本框',
@@ -19,7 +19,8 @@ class ExtendConfig extends Model
         'checkbox' => 'Checkbox选择',
         'select' => 'Seclet单选',
         'multipleSelect' => 'Select多选',
-        'switch' => 'Switch开关'
+        'switch' => 'Switch开关',
+        'number' => 'Number数字'
     ];
 
     public function config_options()
@@ -76,7 +77,7 @@ class ExtendConfig extends Model
             $edit_field = self::where('group', $group)->where('key', $field_key)->first();
             $edit_field->value = $value;
             $edit_field->save();
-            $cache_data[] = [$field_key => $value];
+            $cache_data[$field_key] = $value;
         }
         // 每次修改数据都重新生成缓存
         Cache::put(self::cache_prefix . $group, $cache_data, 60 * 24);
