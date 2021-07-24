@@ -4,6 +4,7 @@ namespace Encore\ArticleManager\Http\Tools;
 use GuzzleHttp\Client;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class Scraper

@@ -120,7 +120,7 @@ class ArticleManagerController extends Controller
     protected function grid()
     {
         $grid = new Grid(new ArticleMedia);
-        $grid->model()->with(['category']);
+        $grid->model()->with(['category'])->orderBy('id', 'desc');
 
         $grid->disableExport();
         $grid->actions(function(Grid\Displayers\Actions $actions){
@@ -145,7 +145,8 @@ class ArticleManagerController extends Controller
 html;
             $tools->append($html);
 
-            $create_route = route('article_manager.create_article');
+//            $create_route = route('article_manager.create_article');
+            $create_route = '/admin/article_manager/create_article';
             $html2 = <<<html
 <div class="btn-group pull-right" style="margin-right: 10px">
     <a href="{$create_route}" class="btn btn-sm btn-success" title="新增">
@@ -304,7 +305,7 @@ html;
         if ($category_id){
             $article_manager->where('category_id', $category_id);
         }
-        $paginator = $article_manager->Paginate(10);
+        $paginator = $article_manager->orderBy('id', 'desc')->Paginate(10);
         return response()->json([
             'code' => 1,
             'data' => $paginator->items(),
